@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Simplified Product Form – Prototype</title>
+<style>
+:root{
+  --accent:#714b67; --accent-soft:#fbf7fa; --link:#017e84; --link-dark:#01585c;
+  --ink:#1f2937; --ink-strong:#111827; --muted:#4b5563; --faint:#6b7280;
+  --line:#e5e7eb; --line-strong:#d1d5db; --bg:#f1f3f5; --surface:#ffffff; --surface-alt:#f9fafb;
+  --chip-bg:#eef2f2; --chip-ink:#1f4f52;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.4 -apple-system,"Segoe UI",system-ui,Ubuntu,"Noto Sans","Helvetica Neue",sans-serif}
+a{color:var(--link);text-decoration:none}a:hover{color:var(--link-dark)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.hidden{display:none!important}
+
+/* top bar */
+.topbar{background:var(--accent);color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:4px 22px;padding:0 20px;min-height:46px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px}
+.topbar nav{display:flex;flex-wrap:wrap;gap:18px}
+.topbar nav a{color:#f3e9f0}.topbar nav a.on{color:#fff;font-weight:600}
+.cp{background:var(--surface);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:10px 20px}
+.cp-left{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.btn-primary{background:var(--accent);color:#fff;border:0;border-radius:4px;padding:0 14px;height:34px;font-weight:600;cursor:pointer}
+.crumb{display:flex;align-items:center;gap:6px;font-size:15px}
+.icon-btn{background:transparent;border:0;height:34px;width:34px;cursor:pointer;color:var(--muted);display:inline-flex;align-items:center;justify-content:center}
+.cp-right{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px}
+
+.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 48px;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.pad{padding:18px 24px 22px}
+
+/* smart buttons */
+.smart{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.smart button{flex:1 1 140px;background:var(--surface);border:0;border-right:1px solid var(--line);padding:10px 16px;text-align:left;cursor:pointer;display:flex;gap:10px;align-items:center}
+.smart button:last-child{border-right:0}
+.smart b{display:block;color:var(--link)}.smart small{font-size:12.5px;color:var(--muted)}
+
+.ident{display:flex;flex-wrap:wrap;gap:24px;padding:22px 24px 24px}
+.ident-main{flex:999 1 420px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.pname-label{font-size:12.5px;font-weight:600;color:var(--muted)}
+.pname{font-size:26px!important;font-weight:600;padding:4px 2px!important;margin-top:-8px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px}
+.imgbox{width:116px;height:116px;border:1px dashed #9ca3af;border-radius:8px;background:var(--surface-alt);color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:12px;cursor:pointer}
+
+/* switch */
+.switch{background:transparent;border:0;padding:0;cursor:pointer;display:inline-flex;align-items:center;gap:10px;min-height:40px}
+.switch .trk{position:relative;display:inline-block;width:40px;height:22px;border-radius:999px;background:#9ca3af;transition:background .15s;flex:0 0 auto}
+.switch .trk::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch[aria-pressed="true"] .trk{background:var(--accent)}
+.switch[aria-pressed="true"] .trk::after{transform:translateX(18px)}
+.switch.locked{cursor:default}.switch.locked .trk{opacity:.55}
+.switch .lbl{font-weight:600}.switch .hint{font-size:13px;color:#374151}
+
+/* segmented */
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden;justify-self:start}
+.seg button{border:0;border-left:1px solid var(--line-strong);padding:0 16px;height:34px;font-size:13.5px;cursor:pointer;background:#fff;color:#374151;white-space:nowrap}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:600}
+
+/* notebook tabs */
+.tabs{display:flex;flex-wrap:wrap;gap:0 2px;padding:0 16px;border-top:1px solid var(--line);background:var(--surface-alt);border-radius:0 0 8px 8px}
+.tabs button{display:inline-flex;align-items:center;gap:8px;background:transparent;border:0;font-size:14px;cursor:pointer;padding:0 18px;height:46px;margin-bottom:-1px;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:#fff;color:var(--ink-strong);font-weight:700;box-shadow:inset 0 3px 0 var(--accent),inset 1px 0 0 var(--line),inset -1px 0 0 var(--line)}
+
+/* fields */
+.sec-h{margin:0 0 12px;font-size:15px;font-weight:700;color:var(--ink-strong);text-transform:uppercase;letter-spacing:.04em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:4px 40px;align-items:center}
+.grid.wide{grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:28px 40px;align-items:start}
+.fld{display:grid;grid-template-columns:160px minmax(0,1fr);align-items:center;column-gap:12px;min-height:38px}
+.fld.full{grid-column:1/-1;padding:4px 0 6px}
+.fld>label,.fld>.lb{font-size:13px;font-weight:600;color:#374151}
+.fld>.lb.muted{color:var(--faint)}
+.inp{width:100%;border:0;border-bottom:1px solid var(--line-strong);background:transparent;padding:7px 2px;font:inherit;font-size:14px;color:var(--ink-strong);border-radius:0}
+.inp:focus{outline:none;border-bottom-color:var(--accent)}
+.inp::placeholder{color:var(--faint)}
+.ta{border:1px solid var(--line-strong);border-radius:4px;padding:8px 10px;resize:vertical;line-height:1.45;display:block}
+.sel{position:relative}.sel svg{position:absolute;right:2px;top:50%;margin-top:-7px;pointer-events:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line-strong)}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:999px;background:var(--chip-bg);color:var(--chip-ink);font-size:12.5px;font-weight:600}
+.note{display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:6px;background:#f3f4f6;font-size:13px;color:#374151}
+.linkbtn{background:transparent;border:0;padding:0;font-weight:600;color:var(--link);cursor:pointer}
+.addbtn{background:transparent;border:0;color:var(--link);font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 4px}
+.outline-btn{background:#fff;border:1px solid var(--line-strong);border-radius:4px;height:34px;padding:0 12px;font-size:13.5px;font-weight:600;color:#374151;cursor:pointer}
+.dashed{border:1px dashed var(--line-strong);border-radius:6px;padding:16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.dashed span{font-size:13.5px;color:var(--muted)}
+.subhead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
+.subhead small{font-size:12.5px;color:var(--muted)}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px}
+.vt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:760px}
+.vt th{text-align:left;font-weight:600;color:#374151;padding:10px;border-bottom:1px solid var(--line);background:var(--surface-alt);white-space:nowrap}
+.vt td{padding:4px 10px;border-bottom:1px solid #f0f1f3;vertical-align:middle}
+.vt tr:last-child td{border-bottom:0}
+.vt .inp{border-bottom-color:transparent}.vt .inp:hover{border-bottom-color:var(--line-strong)}
+.vt .num{text-align:right}
+.pref{font-size:11.5px;font-weight:700;color:#fff;background:var(--link);border-radius:4px;padding:2px 7px;white-space:nowrap}
+.del{background:transparent;border:0;color:var(--faint);width:36px;height:36px;cursor:pointer}
+
+/* advanced */
+.adv-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:18px 24px;border-bottom:1px solid var(--line)}
+.adv-head h2{margin:0;font-size:18px;color:var(--ink-strong)}
+.adv-head p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.search{position:relative;flex:0 1 300px;min-width:220px}
+.search svg{position:absolute;left:10px;top:50%;margin-top:-8px}
+.search input{width:100%;height:38px;border:1px solid var(--line-strong);border-radius:6px;padding:0 12px 0 34px;font:inherit;font-size:13.5px;color:var(--ink-strong);background:#fff}
+.adv-body{display:flex;flex-wrap:wrap;align-items:stretch}
+.adv-nav{flex:1 1 230px;max-width:100%;background:var(--surface-alt);border-right:1px solid var(--line);padding:12px 10px;display:flex;flex-direction:column;gap:2px;border-radius:0 0 0 8px}
+.adv-nav button{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;border:0;border-radius:6px;padding:10px 12px;cursor:pointer;background:transparent;color:var(--ink)}
+.adv-nav button[aria-current="page"]{background:#fff;color:var(--accent);box-shadow:0 0 0 1px var(--line),inset 3px 0 0 var(--accent)}
+.adv-nav b{display:block;font-weight:600;font-size:14px}
+.adv-nav small{display:block;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.35}
+.adv-nav svg{flex:0 0 auto;margin-top:1px}
+.adv-content{flex:999 1 560px;min-width:0;padding:22px 28px 28px}
+.pane{display:flex;flex-direction:column;gap:26px}
+.grp-h{margin:0 0 10px;padding-bottom:7px;border-bottom:1px solid var(--line);font-size:13px;font-weight:700;color:var(--ink-strong);text-transform:uppercase;letter-spacing:.04em}
+.grp-d{margin:-4px 0 12px;font-size:12.5px;color:var(--muted)}
+.tlabel{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+.empty-msg{margin:8px 10px;font-size:13px;color:var(--muted)}
+
+@media (max-width:560px){
+  .fld{grid-template-columns:1fr;row-gap:2px;padding:4px 0}
+  .pad{padding:16px}
+  .adv-content{padding:18px 16px}
+  .adv-nav{border-right:0;border-bottom:1px solid var(--line);border-radius:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+    Inventory
+  </div>
+  <nav aria-label="Main menu">
+    <a href="#">Overview</a><a href="#">Operations</a><a href="#" class="on">Products</a><a href="#">Reporting</a><a href="#">Configuration</a>
+  </nav>
+</header>
+
+<div class="cp">
+  <div class="cp-left">
+    <button type="button" class="btn-primary">New</button>
+    <div class="crumb"><a href="#">Products</a><span style="color:var(--faint)">/</span><strong>Ergonomic Office Chair</strong></div>
+    <button type="button" class="icon-btn" aria-label="Save" style="color:var(--accent)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h11l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3v6h8"/><path d="M7 21v-7h10v7"/></svg></button>
+    <button type="button" class="icon-btn" aria-label="Discard changes"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>
+  </div>
+  <div class="cp-right"><a href="#" style="font-weight:600">Open full product form</a><span>1 / 24</span></div>
+</div>
+
+<div class="wrap">
+
+  <!-- Identity -->
+  <section class="card">
+    <div class="smart">
+      <button type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg><span><b>12.00 Units</b><small>On Hand</small></span></button>
+      <button type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg><span><b>9.00 Units</b><small>Forecasted</small></span></button>
+      <button type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11.5l2-8H6.2"/></svg><span><b>40.00 Units</b><small>Purchased</small></span></button>
+      <button type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg><span><b>31.00 Units</b><small>Sold</small></span></button>
+    </div>
+    <div class="ident">
+      <div class="ident-main">
+        <label for="pname" class="pname-label">Product</label>
+        <input id="pname" class="inp pname" value="Ergonomic Office Chair">
+        <div class="row">
+          <button type="button" class="switch" data-toggle="sell" aria-pressed="true"><span class="trk"></span><span class="lbl">Can be Sold</span></button>
+          <button type="button" class="switch" data-toggle="purchase" aria-pressed="true"><span class="trk"></span><span class="lbl">Can be Purchased</span></button>
+        </div>
+        <div class="row" style="gap:12px">
+          <span style="font-size:13px;font-weight:600;color:#374151;min-width:96px">Product Type</span>
+          <div class="seg" role="group" aria-label="Product type" data-seg="type">
+            <button type="button" data-val="goods" aria-pressed="true">Goods</button>
+            <button type="button" data-val="service" aria-pressed="false">Service</button>
+            <button type="button" data-val="combo" aria-pressed="false">Combo</button>
+          </div>
+        </div>
+      </div>
+      <div><button type="button" class="imgbox" aria-label="Upload product image"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg><span>Product image</span></button></div>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Product form sections">
+      <button type="button" role="tab" data-tab="config" aria-selected="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Product Configuration</button>
+      <button type="button" role="tab" data-tab="advanced" aria-selected="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>Advanced Settings</button>
+    </div>
+  </section>
+
+  <!-- ===== TAB: PRODUCT CONFIGURATION ===== -->
+  <div id="pane-config" style="display:flex;flex-direction:column;gap:16px">
+    <section class="card pad">
+      <h2 class="sec-h">General</h2>
+      <div class="grid">
+        <div class="fld"><label for="ref">Internal Reference</label><input id="ref" class="inp" value="FURN-CH-0042"></div>
+        <div class="fld"><label for="cat">Product Category</label><div class="sel"><input id="cat" class="inp" value="All / Saleable / Office Furniture"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div></div>
+        <div class="fld"><label for="bar">Barcode</label><input id="bar" class="inp" placeholder="Scan or type barcode"></div>
+        <div class="fld"><label for="uom">Unit of Measure</label><div class="sel"><input id="uom" class="inp" value="Units"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div></div>
+      </div>
+      <h2 class="sec-h" style="margin-top:22px">Pricing</h2>
+      <div class="grid">
+        <div class="fld"><label for="sp">Sales Price</label><input id="sp" class="inp" value="$ 320.00"></div>
+        <div class="fld"><label for="cost">Cost</label><input id="cost" class="inp" value="$ 185.00"></div>
+        <div class="fld"><span class="lb">Customer Taxes</span><div class="chips"><span class="chip">15% VAT</span></div></div>
+        <div class="fld"><span class="lb">Vendor Taxes</span><div class="chips"><span class="chip">15% VAT (Purchase)</span></div></div>
+      </div>
+    </section>
+
+    <section class="card pad">
+      <div class="subhead" style="margin-bottom:4px"><h2 class="sec-h" style="margin:0">Vendors &amp; Pricing</h2><small>Vendor prices used on purchase orders</small></div>
+      <div id="no-purchase" class="note hidden" style="margin-top:12px;padding:14px 16px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+        <span>Turn on <strong>Can be Purchased</strong> to add vendors.</span>
+      </div>
+      <div id="vendor-block">
+        <div class="subhead" style="margin:12px 0 8px"><p style="margin:0;font-size:13px;font-weight:600;color:#374151">Vendors</p><small>First row is the preferred vendor for automatic purchase orders</small></div>
+        <div class="tbl-wrap">
+          <table class="vt">
+            <thead><tr><th scope="col">Vendor</th><th scope="col">Vendor Product Code</th><th scope="col" class="num">Min. Qty</th><th scope="col" class="num">Unit Price</th><th scope="col" class="num">Lead Time</th><th scope="col"><span class="sr">Remove</span></th></tr></thead>
+            <tbody id="vendor-rows"></tbody>
+          </table>
+        </div>
+        <button type="button" class="addbtn" id="add-vendor" style="margin-top:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>Add a vendor</button>
+      </div>
+    </section>
+
+    <section class="card pad" id="inventory-sec">
+      <h2 class="sec-h" style="margin-bottom:8px">Inventory</h2>
+      <div class="grid">
+        <div class="fld full">
+          <span class="lb">Tracking</span>
+          <div class="row" style="gap:8px 14px">
+            <div class="seg" role="group" aria-label="Inventory tracking" data-seg="tracking">
+              <button type="button" data-val="qty" aria-pressed="true">By Quantity</button>
+              <button type="button" data-val="serial" aria-pressed="false">By Serial Number</button>
+              <button type="button" data-val="none" aria-pressed="false">None</button>
+            </div>
+            <span id="track-hint" style="font-size:12.5px;color:var(--muted)"></span>
+          </div>
+        </div>
+        <div class="fld">
+          <span class="lb">Dropshipping</span>
+          <span class="switch locked" aria-pressed="true" title="Set automatically, cannot be changed"><span class="trk"></span><span class="hint">Enabled automatically</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Read only"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          </span>
+        </div>
+        <div class="fld"><label for="resp">Responsible</label><div class="sel"><input id="resp" class="inp" value="Mitchell Admin"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div></div>
+        <div class="fld"><label for="brand">Brand</label><div class="sel"><input id="brand" class="inp" placeholder="Select a brand"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div></div>
+        <div class="fld"><label for="model">Model</label><input id="model" class="inp" placeholder="e.g. EC-500"></div>
+      </div>
+    </section>
+
+    <button type="button" class="addbtn" data-goto="advanced" style="align-self:flex-start">More options in Advanced Settings
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button>
+  </div>
+
+  <!-- ===== TAB: ADVANCED SETTINGS ===== -->
+  <section class="card hidden" id="pane-advanced">
+    <div class="adv-head">
+      <div><h2>Advanced Settings</h2><p>Everything from the full product form that is not on Product Configuration.</p></div>
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <label for="advq" class="sr">Search settings</label>
+        <input id="advq" type="search" placeholder="Search settings, e.g. commission, account">
+      </div>
+    </div>
+    <div class="adv-body">
+      <nav class="adv-nav" aria-label="Advanced settings sections">
+        <button type="button" data-sec="gen" data-keys="general information invoicing policy tags company internal notes"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span><b>General Information</b><small>Invoicing policy, tags, company, internal notes</small></span></button>
+        <button type="button" data-sec="var" data-keys="attributes variants color size values"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l9 5-9 5-9-5zM3 12l9 5 9-5M3 17l9 5 9-5"/></svg><span><b>Attributes &amp; Variants</b><small>Color, size and other variant options</small></span></button>
+        <button type="button" data-sec="sales" data-keys="sales upsell cross-sell optional accessory alternative products ecommerce shop published website categories media commission mode rate quotation description"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2l-3 4v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg><span><b>Sales</b><small>Upsell, eCommerce, commissions, descriptions</small></span></button>
+        <button type="button" data-sec="inv" data-keys="inventory routes dropship lead time weight volume hs code origin packaging receipts delivery internal transfers description"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8"/></svg><span><b>Inventory</b><small>Routes, logistics, packaging, transfer notes</small></span></button>
+        <button type="button" data-sec="acc" data-keys="accounting receivables payables income expense price difference account"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10h18M7 15h2M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg><span><b>Accounting</b><small>Income, expense &amp; price difference accounts</small></span></button>
+        <p class="empty-msg hidden" id="nav-empty"></p>
+      </nav>
+
+      <div class="adv-content">
+
+        <!-- General Information -->
+        <div class="pane" data-pane="gen">
+          <div class="note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex:0 0 auto"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>
+            <span>Product type, prices, taxes, category, reference and barcode are on <button type="button" class="linkbtn" data-goto="config">Product Configuration</button>.</span>
+          </div>
+          <div class="grid wide">
+            <div>
+              <h3 class="grp-h">Invoicing</h3>
+              <div class="fld"><span class="lb">Invoicing Policy</span>
+                <div class="seg" role="group" aria-label="Invoicing policy" data-seg="inv">
+                  <button type="button" data-val="order" aria-pressed="false">Ordered quantities</button>
+                  <button type="button" data-val="delivery" aria-pressed="true">Delivered quantities</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3 class="grp-h">Organisation</h3>
+              <div class="fld"><span class="lb">Product Tags</span><div class="chips"><span class="chip">Office</span></div></div>
+              <div class="fld"><label for="co">Company</label><div class="sel"><input id="co" class="inp" placeholder="Shared across companies"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div></div>
+            </div>
+          </div>
+          <div>
+            <h3 class="grp-h">Internal Notes</h3>
+            <label for="inote" class="sr">Internal notes</label>
+            <textarea id="inote" class="inp ta" rows="3" placeholder="This note is only for internal purposes."></textarea>
+          </div>
+        </div>
+
+        <!-- Attributes & Variants -->
+        <div class="pane hidden" data-pane="var" style="gap:12px">
+          <div><h3 class="grp-h">Attributes &amp; Variants</h3><p class="grp-d">Each combination of values becomes its own variant with its own stock and barcode.</p></div>
+          <div class="tbl-wrap">
+            <table class="vt" style="min-width:560px">
+              <thead><tr><th scope="col" style="width:220px">Attribute</th><th scope="col">Values</th><th scope="col"><span class="sr">Remove</span></th></tr></thead>
+              <tbody id="attr-rows"></tbody>
+            </table>
+          </div>
+          <div class="subhead" style="align-items:center">
+            <button type="button" class="addbtn" id="add-attr"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>Add a line</button>
+            <span id="variant-text" style="font-size:13.5px;color:#374151"></span>
+          </div>
+        </div>
+
+        <!-- Sales -->
+        <div class="pane hidden" data-pane="sales" style="gap:28px">
+          <div class="grid wide">
+            <div>
+              <h3 class="grp-h">Upsell &amp; Cross-sell</h3>
+              <div class="fld"><label for="optp">Optional Products</label><input id="optp" class="inp" placeholder="Recommend when adding to cart or quotation"></div>
+              <div class="fld"><label for="accp">Accessory Products</label><input id="accp" class="inp" placeholder="Suggested accessories in the eCommerce cart"></div>
+              <div class="fld"><label for="altp">Alternative Products</label><input id="altp" class="inp" placeholder="Displayed at the bottom of product pages"></div>
+            </div>
+            <div>
+              <h3 class="grp-h">eCommerce Shop</h3>
+              <div class="fld"><span class="lb">Is Published</span>
+                <button type="button" class="switch" data-toggle="published" aria-pressed="false" aria-label="Is published" style="justify-self:start"><span class="trk"></span><span class="hint" id="published-text"></span></button>
+              </div>
+              <div class="fld"><label for="web">Website</label><div class="sel"><input id="web" class="inp" placeholder="All"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div></div>
+              <div class="fld"><label for="wcat">Categories</label><input id="wcat" class="inp" placeholder="eCommerce categories"></div>
+            </div>
+            <div>
+              <h3 class="grp-h">eCommerce Media</h3>
+              <div class="dashed"><span>Extra images and videos for the product page.</span><button type="button" class="outline-btn">Add Media</button></div>
+            </div>
+            <div>
+              <h3 class="grp-h">Commissions</h3>
+              <div class="fld"><span class="lb">Override Commission</span>
+                <button type="button" class="switch" data-toggle="comm" aria-pressed="false" aria-label="Override commission" style="justify-self:start"><span class="trk"></span><span class="hint" id="comm-text"></span></button>
+              </div>
+              <div id="comm-off">
+                <div class="fld"><span class="lb muted">Commission Mode</span><span style="color:var(--muted)">Percentage</span></div>
+                <div class="fld"><span class="lb muted">Commission Rate</span><span style="color:var(--muted)">0%</span></div>
+              </div>
+              <div id="comm-on" class="hidden">
+                <div class="fld"><span class="lb">Commission Mode</span>
+                  <div class="seg" role="group" aria-label="Commission mode" data-seg="commMode">
+                    <button type="button" data-val="pct" aria-pressed="true">Percentage</button>
+                    <button type="button" data-val="fixed" aria-pressed="false">Fixed amount</button>
+                  </div>
+                </div>
+                <div class="fld"><label for="crate">Commission Rate</label><input id="crate" class="inp" value="0%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="grid wide">
+            <div><h3 class="grp-h">Quotation Description</h3><label for="qd" class="sr">Quotation description</label><textarea id="qd" class="inp ta" rows="3" placeholder="This note is added to sales orders and invoices."></textarea></div>
+            <div><h3 class="grp-h">eCommerce Description</h3><label for="ed" class="sr">eCommerce description</label><textarea id="ed" class="inp ta" rows="3" placeholder="A short description shown on the product page."></textarea></div>
+          </div>
+        </div>
+
+        <!-- Inventory -->
+        <div class="pane hidden" data-pane="inv" style="gap:28px">
+          <div class="grid wide">
+            <div>
+              <h3 class="grp-h">Operations</h3>
+              <div class="fld"><span class="lb">Routes</span><div class="chips"><span class="chip" id="route-chip">Dropship</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Read only"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div></div>
+              <div class="fld"><label for="clt">Customer Lead Time</label><input id="clt" class="inp" value="0 days"></div>
+            </div>
+            <div>
+              <h3 class="grp-h">Logistics</h3>
+              <div class="fld"><label for="wt">Weight</label><input id="wt" class="inp" value="14.50 kg"></div>
+              <div class="fld"><label for="vol">Volume</label><input id="vol" class="inp" value="0.32 m³"></div>
+              <div class="fld"><label for="hs">HS Code</label><input id="hs" class="inp" placeholder="e.g. 9401.30"></div>
+              <div class="fld"><label for="org">Origin of Goods</label><div class="sel"><input id="org" class="inp" placeholder="Select a country"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div></div>
+            </div>
+          </div>
+          <div><h3 class="grp-h">Packaging</h3><div class="dashed"><span>No packagings yet.</span><button type="button" class="outline-btn">Add a packaging</button></div></div>
+          <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 24px;align-items:start">
+            <div><label for="rn" class="tlabel">Description for Receipts</label><textarea id="rn" class="inp ta" rows="2" placeholder="Internal note"></textarea></div>
+            <div><label for="dn" class="tlabel">Description for Delivery Orders</label><textarea id="dn" class="inp ta" rows="2" placeholder="Printed on the delivery slip"></textarea></div>
+            <div><label for="itn" class="tlabel">Description for Internal Transfers</label><textarea id="itn" class="inp ta" rows="2" placeholder="Internal note"></textarea></div>
+          </div>
+        </div>
+
+        <!-- Accounting -->
+        <div class="pane hidden" data-pane="acc" style="gap:18px">
+          <p class="grp-d" style="margin:0">Leave empty to use the accounts set on the product category.</p>
+          <div class="grid wide">
+            <div>
+              <h3 class="grp-h">Receivables</h3>
+              <div class="fld"><label for="inc">Income Account</label><div class="sel"><input id="inc" class="inp" placeholder="From category"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div></div>
+            </div>
+            <div>
+              <h3 class="grp-h">Payables</h3>
+              <div class="fld"><label for="exp">Expense Account</label><div class="sel"><input id="exp" class="inp" placeholder="From category"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div></div>
+              <div class="fld"><label for="pdiff">Price Difference Account</label><div class="sel"><input id="pdiff" class="inp" placeholder="From category"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  var state = {
+    sell: true, purchase: true, type: 'goods', tracking: 'qty',
+    tab: 'config', sec: 'gen', query: '',
+    published: false, comm: false, commMode: 'pct',
+    vendors: [
+      { id: 1, name: 'Wood Corner', code: 'WC-CH-01', min: '1.00', price: '185.00', lead: '5 days' },
+      { id: 2, name: 'Azure Interior', code: 'AZ-2231', min: '10.00', price: '179.50', lead: '12 days' }
+    ],
+    attrs: [
+      { id: 1, name: 'Color', values: ['Black', 'Grey'] },
+      { id: 2, name: 'Armrest', values: ['Fixed', 'Adjustable'] }
+    ],
+    nextId: 100
+  };
+  var trackHints = { qty: 'Stock is tracked as a quantity', serial: 'Each unit needs a unique serial number', none: 'Stock is not tracked' };
+  var $ = function (s) { return document.querySelector(s); };
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+  var esc = function (v) { return String(v).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var trash = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>';
+
+  function renderVendors() {
+    $('#vendor-rows').innerHTML = state.vendors.map(function (v, i) {
+      return '<tr><td><div style="display:flex;align-items:center;gap:8px">' +
+        '<input class="inp" aria-label="Vendor" value="' + esc(v.name) + '" placeholder="Select a vendor" style="min-width:150px">' +
+        (i === 0 && v.name ? '<span class="pref">Preferred</span>' : '') + '</div></td>' +
+        '<td><input class="inp" aria-label="Vendor product code" value="' + esc(v.code) + '" placeholder="Optional"></td>' +
+        '<td><input class="inp num" aria-label="Minimum quantity" value="' + esc(v.min) + '"></td>' +
+        '<td><input class="inp num" aria-label="Unit price" value="' + esc(v.price) + '"></td>' +
+        '<td><input class="inp num" aria-label="Lead time" value="' + esc(v.lead) + '"></td>' +
+        '<td style="width:44px"><button type="button" class="del" aria-label="Remove vendor" data-del-vendor="' + v.id + '">' + trash + '</button></td></tr>';
+    }).join('');
+  }
+
+  function renderAttrs() {
+    $('#attr-rows').innerHTML = state.attrs.map(function (a) {
+      var vals = a.values.length
+        ? a.values.map(function (x) { return '<span class="chip">' + esc(x) + '</span>'; }).join('')
+        : '<span style="font-size:13px;color:var(--faint)">Add values</span>';
+      return '<tr><td><input class="inp" aria-label="Attribute" value="' + esc(a.name) + '" placeholder="Select an attribute"></td>' +
+        '<td style="padding:10px"><span style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">' + vals + '</span></td>' +
+        '<td style="width:44px"><button type="button" class="del" aria-label="Remove attribute" data-del-attr="' + a.id + '">' + trash + '</button></td></tr>';
+    }).join('');
+    var withVals = state.attrs.filter(function (a) { return a.values.length; });
+    var n = withVals.reduce(function (p, a) { return p * a.values.length; }, 1);
+    $('#variant-text').textContent = withVals.length ? 'This product will have ' + n + ' variant' + (n === 1 ? '' : 's') : 'No variants';
+  }
+
+  function update() {
+    $$('[data-toggle]').forEach(function (b) { b.setAttribute('aria-pressed', state[b.dataset.toggle] ? 'true' : 'false'); });
+    $$('[data-seg]').forEach(function (g) {
+      var key = g.dataset.seg;
+      Array.prototype.forEach.call(g.querySelectorAll('button'), function (b) {
+        b.setAttribute('aria-pressed', b.dataset.val === state[key] ? 'true' : 'false');
+      });
+    });
+    var goods = state.type === 'goods';
+    $('#no-purchase').classList.toggle('hidden', state.purchase);
+    $('#vendor-block').classList.toggle('hidden', !state.purchase);
+    $('#inventory-sec').classList.toggle('hidden', !goods);
+    $('#track-hint').textContent = trackHints[state.tracking];
+    $('#route-chip').textContent = state.purchase && goods ? 'Dropship' : 'None';
+    $('#published-text').textContent = state.published ? 'Visible on the website' : 'Not published';
+    $('#comm-text').textContent = state.comm ? 'Custom commission for this product' : 'Uses the default commission';
+    $('#comm-on').classList.toggle('hidden', !state.comm);
+    $('#comm-off').classList.toggle('hidden', state.comm);
+
+    $$('[data-tab]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === state.tab ? 'true' : 'false'); });
+    $('#pane-config').style.display = state.tab === 'config' ? 'flex' : 'none';
+    $('#pane-advanced').classList.toggle('hidden', state.tab !== 'advanced');
+
+    var q = state.query.trim().toLowerCase();
+    var visible = $$('[data-sec]').filter(function (b) {
+      var match = !q || (b.textContent + ' ' + b.dataset.keys).toLowerCase().indexOf(q) !== -1;
+      b.classList.toggle('hidden', !match);
+      return match;
+    });
+    var sec = state.sec;
+    if (visible.length && !visible.some(function (b) { return b.dataset.sec === sec; })) sec = visible[0].dataset.sec;
+    $$('[data-sec]').forEach(function (b) { b.setAttribute('aria-current', b.dataset.sec === sec ? 'page' : 'false'); });
+    $$('[data-pane]').forEach(function (p) { p.classList.toggle('hidden', !visible.length || p.dataset.pane !== sec); });
+    var empty = $('#nav-empty');
+    empty.classList.toggle('hidden', visible.length > 0);
+    empty.textContent = 'No settings match “' + state.query + '”.';
+  }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button');
+    if (!t) return;
+    if (t.dataset.toggle) { state[t.dataset.toggle] = !state[t.dataset.toggle]; }
+    else if (t.parentNode && t.parentNode.dataset && t.parentNode.dataset.seg) {
+      var key = t.parentNode.dataset.seg; state[key] = t.dataset.val;
+      if (key === 'commMode') $('#crate').value = t.dataset.val === 'pct' ? '0%' : '$ 0.00';
+    }
+    else if (t.dataset.tab) { state.tab = t.dataset.tab; }
+    else if (t.dataset.goto) { state.tab = t.dataset.goto; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    else if (t.dataset.sec) { state.sec = t.dataset.sec; }
+    else if (t.dataset.delVendor) { state.vendors = state.vendors.filter(function (v) { return v.id !== +t.dataset.delVendor; }); renderVendors(); }
+    else if (t.id === 'add-vendor') { state.vendors.push({ id: state.nextId++, name: '', code: '', min: '1.00', price: '0.00', lead: '0 days' }); renderVendors(); }
+    else if (t.dataset.delAttr) { state.attrs = state.attrs.filter(function (a) { return a.id !== +t.dataset.delAttr; }); renderAttrs(); }
+    else if (t.id === 'add-attr') { state.attrs.push({ id: state.nextId++, name: '', values: [] }); renderAttrs(); }
+    else return;
+    update();
+  });
+  $('#advq').addEventListener('input', function (e) { state.query = e.target.value; update(); });
+
+  renderVendors();
+  renderAttrs();
+  update();
+})();
+</script>
+</body>
+</html>
